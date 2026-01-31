@@ -1,0 +1,25 @@
+{
+  "device": "cuda",
+  "amp": true,
+  "channels_last": true,
+  "compile": true,
+  "frames_total": 557,
+  "fps": 29.97002997002997,
+  "duration_sec": 18.585233333333335,
+  "crf": 16,
+  "preset": "slow",
+  "tune": "film",
+  "bench_warmup": 5,
+  "bench_measure": 30,
+  "stage_times_ms": {
+    "prepare_mean": 6.4162709439794225,
+    "model_mean": 34.56694111227989,
+    "post_mean": 0.8967688928047816,
+    "total_mean": 41.91993636389574
+  },
+  "lat_mean_ms": 34.523695119222005,
+  "lat_p50_ms": 32.82070541381836,
+  "lat_p90_ms": 32.87785720825195,
+  "lat_p99_ms": 83.63504028320312,
+  "fps_est": 28.96561322728235
+}

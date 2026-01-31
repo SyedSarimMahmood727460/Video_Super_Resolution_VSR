@@ -1,0 +1,36 @@
+Kernel Performance Report
+=========================
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                                                   Name    Self CPU %      Self CPU   CPU total %     CPU total  CPU time avg     Self CUDA   Self CUDA %    CUDA total  CUDA time avg       CPU Mem  Self CPU Mem    # of Calls  
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+                             Torch-Compiled Region: 0/0         1.82%       1.416ms         2.50%       1.947ms       1.947ms      75.849ms        99.79%      76.170ms      76.170ms           0 b           0 b             1  
+void cutlass__5x_cudnn::Kernel<cutlass_tensorop_s168...         0.00%       0.000us         0.00%       0.000us       0.000us      23.324ms        30.69%      23.324ms       1.794ms           0 b           0 b            13  
+void cudnn::engines_precompiled::convertTensor_kerne...         0.00%       0.000us         0.00%       0.000us       0.000us      12.540ms        16.50%      12.540ms     391.863us           0 b           0 b            32  
+                                  ampere_sgemm_64x64_tn         0.00%       0.000us         0.00%       0.000us       0.000us       7.525ms         9.90%       7.525ms     684.085us           0 b           0 b            11  
+                triton_poi_fused_add_convolution_silu_8         0.00%       0.000us         0.00%       0.000us       0.000us       4.616ms         6.07%       4.616ms     769.256us           0 b           0 b             6  
+sm80_xmma_fprop_implicit_gemm_indexed_wo_smem_tf32f3...         0.00%       0.000us         0.00%       0.000us       0.000us       4.615ms         6.07%       4.615ms       4.615ms           0 b           0 b             1  
+                         triton_poi_fused_convolution_2         0.00%       0.000us         0.00%       0.000us       0.000us       4.288ms         5.64%       4.288ms       4.288ms           0 b           0 b             1  
+void cutlass__5x_cudnn::Kernel<cutlass_tensorop_s168...         0.00%       0.000us         0.00%       0.000us       0.000us       3.151ms         4.15%       3.151ms       3.151ms           0 b           0 b             1  
+                               triton_poi_fused_stack_5         0.00%       0.000us         0.00%       0.000us       0.000us       3.048ms         4.01%       3.048ms     609.534us           0 b           0 b             5  
+                    triton_poi_fused_convolution_silu_7         0.00%       0.000us         0.00%       0.000us       0.000us       3.035ms         3.99%       3.035ms     505.822us           0 b           0 b             6  
+                    triton_poi_fused_convolution_silu_1         0.00%       0.000us         0.00%       0.000us       0.000us       2.535ms         3.34%       2.535ms       2.535ms           0 b           0 b             1  
+                  triton_poi_fused_pixel_shuffle_silu_9         0.00%       0.000us         0.00%       0.000us       0.000us       2.057ms         2.71%       2.057ms       2.057ms           0 b           0 b             1  
+sm80_xmma_fprop_implicit_gemm_indexed_wo_smem_tf32f3...         0.00%       0.000us         0.00%       0.000us       0.000us       1.603ms         2.11%       1.603ms       1.603ms           0 b           0 b             1  
+                    triton_poi_fused__softmax_mul_sum_6         0.00%       0.000us         0.00%       0.000us       0.000us       1.524ms         2.00%       1.524ms       1.524ms           0 b           0 b             1  
+                             triton_per_fused_mul_sum_3         0.00%       0.000us         0.00%       0.000us       0.000us       1.522ms         2.00%       1.522ms       1.522ms           0 b           0 b             1  
+                                   aten::_foreach_copy_         0.07%      57.270us         0.45%     350.903us     350.903us     160.512us         0.21%     321.024us     321.024us           0 b           0 b             1  
+triton_poi_fused_add_clamp_convolution_pixel_shuffle...         0.00%       0.000us         0.00%       0.000us       0.000us     195.519us         0.26%     195.519us     195.519us           0 b           0 b             1  
+                                           Unrecognized         0.32%     251.822us         0.32%     251.822us     251.822us     160.512us         0.21%     160.512us     160.512us           0 b           0 b             1  
+void at::native::(anonymous namespace)::multi_tensor...         0.00%       0.000us         0.00%       0.000us       0.000us     160.512us         0.21%     160.512us     160.512us           0 b           0 b             1  
+                         triton_poi_fused_convolution_0         0.00%       0.000us         0.00%       0.000us       0.000us     158.111us         0.21%     158.111us     158.111us           0 b           0 b             1  
+triton_poi_fused__to_copy__unsafe_index_add_arange_c...         0.00%       0.000us         0.00%       0.000us       0.000us      85.311us         0.11%      85.311us      85.311us           0 b           0 b             1  
+                                     triton_poi_fused_4         0.00%       0.000us         0.00%       0.000us       0.000us      28.512us         0.04%      28.512us      28.512us           0 b           0 b             1  
+                               TorchDynamo Cache Lookup         0.15%     118.681us         0.15%     118.681us     118.681us       0.000us         0.00%       0.000us       0.000us           0 b           0 b             1  
+                                       cudaLaunchKernel         0.05%      41.811us         0.05%      41.811us      41.811us       0.000us         0.00%       0.000us       0.000us           0 b           0 b             1  
+                                  cudaStreamIsCapturing         0.01%       4.070us         0.01%       4.070us       4.070us       0.000us         0.00%       0.000us       0.000us           0 b           0 b             1  
+                                        cudaGraphLaunch         0.23%     176.531us         0.23%     176.531us     176.531us       0.000us         0.00%       0.000us       0.000us           0 b           0 b             1  
+                                   cudaDriverGetVersion         0.00%       0.150us         0.00%       0.150us       0.150us       0.000us         0.00%       0.000us       0.000us           0 b           0 b             1  
+                                  cudaDeviceSynchronize        97.34%      75.694ms        97.34%      75.694ms      75.694ms       0.000us         0.00%       0.000us       0.000us           0 b           0 b             1  
+-------------------------------------------------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  ------------  
+Self CPU time total: 77.760ms
+Self CUDA time total: 76.010ms

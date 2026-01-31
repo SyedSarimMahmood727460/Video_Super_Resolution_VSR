@@ -1,0 +1,23 @@
+LiteVSR Performance Report
+==========================
+Frames: 557
+FPS (input/output): 29.97
+Duration (sec): 18.59
+Scale: 2x, Window: 5
+Target height: 720
+Precision: fp32
+Encoder: crf=16, preset=slow, tune=film
+
+Stage timing (ms, mean over measured frames)
+  prepare: 17.17
+  model: 77.80
+  postprocess: 0.92
+  total: 95.95
+
+Bottleneck analysis
+  prepare: 17.9%
+  model: 81.1%
+  postprocess: 1.0%
+  bottleneck: model
+
+Max GPU memory allocated: 1.01 GB

@@ -1,0 +1,44 @@
+GPU: NVIDIA A100-SXM4-40GB MIG 1g.5gb
+GPU Memory: 5.1 GB
+Auto-detected input FPS: 29.97
+Processing 557 frames @ 29.97 fps (18.6s)...
+  Frame 1/557
+  Frame 51/557
+  Frame 101/557
+  Frame 151/557
+  Frame 201/557
+  Frame 251/557
+  Frame 301/557
+  Frame 351/557
+  Frame 401/557
+  Frame 451/557
+  Frame 501/557
+  Frame 551/557
+Processed 557 frames
+Writing video @ 29.97 fps...
+ Video saved: /users/ynouia/gpu-course/Video-Super-Resolution-VSR-/output/run_004/out_720p.mp4
+{
+  "device": "cuda",
+  "amp": true,
+  "channels_last": true,
+  "compile": true,
+  "frames_total": 557,
+  "fps": 29.97002997002997,
+  "duration_sec": 18.585233333333335,
+  "crf": 16,
+  "preset": "slow",
+  "tune": "film",
+  "bench_warmup": 5,
+  "bench_measure": 30,
+  "stage_times_ms": {
+    "prepare_mean": 6.4162709439794225,
+    "model_mean": 34.56694111227989,
+    "post_mean": 0.8967688928047816,
+    "total_mean": 41.91993636389574
+  },
+  "lat_mean_ms": 34.523695119222005,
+  "lat_p50_ms": 32.82070541381836,
+  "lat_p90_ms": 32.87785720825195,
+  "lat_p99_ms": 83.63504028320312,
+  "fps_est": 28.96561322728235
+}
