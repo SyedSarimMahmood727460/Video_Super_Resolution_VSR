@@ -9,17 +9,29 @@
 #SBATCH --mem=64G
 
 module purge
-module load pytorch
+module load gcc/11.2.0
+module load cuda
+module load ffmpeg
 
-cd /scratch/project_2016196/$USER/Video-Super-Resolution-VSR-
-source .venv/bin/activate
+PROJECT_DIR="${PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$PWD}}"
+cd "$PROJECT_DIR"
+
+make -C cuda_vsr clean all
+
+RUN_DIR=/scratch/project_2016196/$USER/cuda_vsr_nsys
+IN_FRAMES=$RUN_DIR/frames_in
+OUT_FRAMES=$RUN_DIR/frames_out
+mkdir -p "$IN_FRAMES" "$OUT_FRAMES"
+
+ffmpeg -hide_banner -loglevel error -y \
+  -i /scratch/project_2016196/$USER/input.mp4 \
+  -vsync 0 -pix_fmt rgb24 \
+  "$IN_FRAMES/frame_%06d.ppm"
 
 srun nsys profile --stats=true --force-overwrite=true -o nsys_vsr \
-  python -m vsr.infer \
-    --input /scratch/project_2016196/$USER/input.mp4 \
-    --output /scratch/project_2016196/$USER/out.mp4 \
-    --ckpt checkpoints/litevsr_scale2.pt \
-    --scale 2 --window 5 \
-    --precision amp --channels_last \
-    --benchmark --warmup 10 --measure 50 \
-    --save_metrics metrics.json
+  ./cuda_vsr/bin/cuda_vsr \
+    --input_dir "$IN_FRAMES" \
+    --output_dir "$OUT_FRAMES" \
+    --backend cuda \
+    --target_height 0 \
+    --metrics "$RUN_DIR/metrics.json"

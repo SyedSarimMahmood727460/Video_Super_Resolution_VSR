@@ -3,3 +3,16 @@ input/*
 !input/.gitkeep
 output/*
 !output/.gitkeep
+Slides/
+Teacher comments/
+slides/
+teacher comments/
+idea/
+cuda_vsr/bin/
+output/frames_in/
+output/frames_out/
+frames_in/
+frames_in.tar.gz
+__pycache__/
+*.pyc
+vsr_mahti.egg-info/

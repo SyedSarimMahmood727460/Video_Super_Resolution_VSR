@@ -1,97 +1,118 @@
-# Video Super-Resolution (Mahti)
+# Video Super-Resolution (CUDA Kernels) on Mahti
 
-Lightweight VSR pipeline for Mahti. This setup:
-- Accepts input videos at **exactly** 360p, 480p, or 720p
-- Upscales to **specific targets only**:
-  - 360p → 480p / 720p / 1080p
-  - 480p → 720p
-  - 720p → 1080p
-- Writes each run to `output/run_XXX/` with logs + reports
-- Uses high‑quality encoding (CRF 16, BT.709 metadata)
+This project runs custom CUDA kernels (no PyTorch runtime path) and is set up for Mahti SLURM jobs.
 
-## Quick Start (Mahti)
+## Pipeline
 
-### 1) Start a VS Code session on Mahti
-Recommended settings:
-- Partition: `gpusmall`
-- CPUs: `1`
-- Memory: `2 GiB`
-- Compiler: `gcc/11.2.0` (or latest)
-- Python module: `pytorch/2.9` (or latest)
-- Other modules: cuda
+- Supported input heights: `360`, `480`, `720`
+- Output rules:
+  - `360 -> 480 / 720 / 1080`
+  - `480 -> 720`
+  - `720 -> 1080`
+- Per run output folder: `output/run_XXX/`
+  - `out.mp4`
+  - `metrics.json`
+  - `report.txt`
+  - `kernel_report.txt`
+  - `run.log`
+  - `frames_in/`, `frames_out/`
 
-### 2) Clone the repo on scratch
+## Mahti Run Guide
+
+### 1) Clone to scratch
+
 ```bash
-cd /scratch/project_2016196/<your_user>
-git clone <your_repo_url> Video-Super-Resolution-VSR-
-cd Video-Super-Resolution-VSR-
+cd /scratch/project_2016196/$USER
+git clone git@github.com:SyedSarimMahmood727460/Video_Super_Resolution_VSR.git
+cd Video_Super_Resolution_VSR
+mkdir -p input output
 ```
 
-### 3) Prepare input/output folders if not available
+### 2) Install ffmpeg once (user space)
+
+Mahti may not provide an `ffmpeg` module. Install a local static binary once:
+
 ```bash
-mkdir -p input output 
+bash scripts/install_ffmpeg_user.sh /scratch/project_2016196/$USER/bin
 ```
 
-Place your input video here (must be 360p, 480p, or 720p):
-```
-input/input.mp4
-```
+Optional check:
 
-### 4) Run
 ```bash
-bash main.sh
+/scratch/project_2016196/$USER/bin/ffmpeg -version
+/scratch/project_2016196/$USER/bin/ffprobe -version
 ```
 
-The script will create a run folder:
-```
-output/run_001/
-  out_720p.mp4 (or out_1080p.mp4)
-  metrics.json
-  report.txt
-  kernel_report.txt
-  run.log
-```
+### 3) Put video input
 
-## Targets & Overrides
-
-By default, the target height is auto‑selected:
-- 360p → 720p
-- 480p → 720p
-- 720p → 1080p
-
-You can override the target height at runtime:
 ```bash
-TARGET_HEIGHT=1080 bash main.sh
+cp /path/to/your_video.mp4 input/input.mp4
 ```
 
-Allowed targets are enforced. Any other input resolution or target will error.
+You can also keep any filename/path and pass it with `INPUT_FILE=...` during submit.
 
-## Checkpoint
+### 4) Submit GPU job
 
-Place the pretrained checkpoint here:
+```bash
+sbatch --export=ALL,PROJECT_DIR=$PWD,FFMPEG_DIR=/scratch/project_2016196/$USER/bin,INPUT_FILE=$PWD/input/input.mp4 scripts/slurm_run_mahti.sh
 ```
-checkpoints/litevsr_scale2.pt
+
+With explicit target height example:
+
+```bash
+sbatch --export=ALL,PROJECT_DIR=$PWD,FFMPEG_DIR=/scratch/project_2016196/$USER/bin,INPUT_FILE=$PWD/input/input.mp4,TARGET_HEIGHT=1080 scripts/slurm_run_mahti.sh
 ```
-If it is missing, the script exits with an error.
 
-## Output Notes
+### 5) Monitor job
 
-Color is encoded with BT.709 metadata for consistency. If you see a color shift:
-- Try `PIX_FMT=yuv420p` for broader player compatibility:
-  ```bash
-  PIX_FMT=yuv420p bash main.sh
-  ```
+```bash
+squeue -u $USER
+tail -f slurm-<jobid>.out
+```
+
+### 6) Get results
+
+```bash
+latest=$(ls -dt output/run_* | head -n1)
+ls -lh "$latest"
+cat "$latest/report.txt"
+```
+
+Main output video:
+
+```bash
+$latest/out.mp4
+```
+
+## Common Overrides
+
+- `INPUT_FILE`: input video path (default `input/input.mp4`)
+- `TARGET_HEIGHT`: `0` (auto), or set `480` / `720` / `1080`
+- `BACKEND`: `cuda` (default) or `cpu`
+- `SKIP_BUILD=1`: reuse existing `cuda_vsr/bin/cuda_vsr`
+- `SKIP_VIDEO_ENCODE=1`: skip mp4 encoding (frames + metrics only)
+- `GCC_MODULE` and `CUDA_MODULE`: module versions used by job script
+
+Submit with custom modules:
+
+```bash
+sbatch --export=ALL,PROJECT_DIR=$PWD,FFMPEG_DIR=/scratch/project_2016196/$USER/bin,GCC_MODULE=gcc/10.4.0,CUDA_MODULE=cuda/12.6.1 scripts/slurm_run_mahti.sh
+```
 
 ## Troubleshooting
 
-- **Input not found**: ensure `input/input.mp4` exists.
-- **Resolution not allowed**: input must be exactly 360p / 480p / 720p.
-- **Stale file handle**: re‑enter the directory and re‑run:
-  ```bash
-  cd /scratch/project_2016196/<your_user>/Video-Super-Resolution-VSR-
-  bash main.sh
-  ```
+- `AssocMaxSubmitJobLimit`:
+  - You already have a running job/session (often VS Code compute session). Wait or stop that job, then submit again.
+- `nvcc not found`:
+  - Ensure valid module combo on Mahti (for example `gcc/10.4.0` + `cuda/12.6.1`).
+- `ffmpeg not found`:
+  - Re-run `scripts/install_ffmpeg_user.sh` and submit with `FFMPEG_DIR=/scratch/project_2016196/$USER/bin`.
+- `input video not found`:
+  - Check `INPUT_FILE` path in submit command.
 
-## Files ignored by Git
+## Relevant Files
 
-`input/` and `output/` folders are tracked, but their contents are ignored.
+- `main.sh`: entry wrapper
+- `scripts/slurm_run_mahti.sh`: primary SLURM submit script
+- `scripts/run_cuda_vsr_mahti.sh`: build + extract + kernel run + encode
+- `scripts/install_ffmpeg_user.sh`: one-time ffmpeg install to user bin

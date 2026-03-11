@@ -9,18 +9,15 @@
 #SBATCH --mem=64G
 
 module purge
-module load pytorch
+module load gcc/11.2.0
+module load cuda
+module load ffmpeg
 
-cd /scratch/project_2016196/$USER/Video-Super-Resolution-VSR-
-source .venv/bin/activate
-
+PROJECT_DIR="${PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$PWD}}"
+cd "$PROJECT_DIR"
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+export INPUT_FILE=/scratch/project_2016196/$USER/input.mp4
+export OUTPUT_FILE=/scratch/project_2016196/$USER/out_cuda_vsr.mp4
+export TARGET_HEIGHT=0
 
-srun python -m vsr.infer \
-  --input /scratch/project_2016196/$USER/input.mp4 \
-  --output /scratch/project_2016196/$USER/out.mp4 \
-  --ckpt checkpoints/litevsr_scale2.pt \
-  --scale 2 --window 5 \
-  --precision amp --channels_last \
-  --benchmark --warmup 50 --measure 300 \
-  --save_metrics metrics.json
+srun bash ./main.sh
